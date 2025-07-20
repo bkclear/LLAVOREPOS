@@ -1,39 +1,22 @@
 // Define a cache name
-const CACHE_NAME = 'llavorepos-cache-v2'; // Changed to v2 to ensure it updates
+const CACHE_NAME = 'llavorepos-cache-v3'; // Using v3 to force an update
 
-// List the files to cache with correct paths
+// List the ONLY files we need to cache
 const urlsToCache = [
   '/LLAVOREPOS/',
   '/LLAVOREPOS/index.html',
-  '/LLAVOREPOS/style.css',   // Make sure your CSS file is named style.css
-  '/LLAVOREPOS/script.js',  // Make sure your JS file is named script.js
   '/LLAVOREPOS/icons/icon-192x192.png',
   '/LLAVOREPOS/icons/icon-512x512.png'
 ];
 
-// Install event: open a cache and add the files
+// Install event
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
 });
 
-// Fetch event: serve cached content when offline
+// Fetch event
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
-  );
+  event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
 });
 
 // Clean up old caches
