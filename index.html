@@ -476,5 +476,12 @@
         function parseCsv(csvText) { const lines = csvText.trim().split(/\r\n|\n/); if (lines.length < 2) return []; const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '')); const requiredHeaders = ['name', 'sellPrice', 'unitsPerCase', 'purchasePriceCase']; if (!requiredHeaders.every(h => headers.includes(h))) { throw new Error('CSV file is missing required headers: ' + requiredHeaders.join(', ')); } const newProducts = []; for (let i = 1; i < lines.length; i++) { if (!lines[i]) continue; const values = lines[i].split(',').map(v => v.trim().replace(/"/g, '')); let productObj = {}; headers.forEach((header, index) => { productObj[header] = values[index]; }); const unitsPerCase = parseInt(productObj.unitsPerCase) || 1; const purchasePriceCase = parseFloat(productObj.purchasePriceCase) || 0; productObj = { ...productObj, id: Date.now() + i, stock: parseInt(productObj.stock) || 0, unitsPerCase: unitsPerCase, purchasePriceCase: purchasePriceCase, purchasePrice: (unitsPerCase > 0) ? (purchasePriceCase / unitsPerCase) : 0, sellPrice: parseFloat(productObj.sellPrice), caseSellPrice: parseFloat(productObj.caseSellPrice) || 0, unitsPerHalfCase: parseInt(productObj.unitsPerHalfCase) || 0, halfCaseSellPrice: parseFloat(productObj.halfCaseSellPrice) || 0 }; if (productObj.name && !isNaN(productObj.sellPrice)) { newProducts.push(productObj); } } return newProducts; }
 
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+    </script>
 </body>
 </html>
