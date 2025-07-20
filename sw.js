@@ -1,22 +1,20 @@
-const CACHE_NAME = 'pos-cache-v1';
+const CACHE_NAME = 'pos-cache-v2'; // Changed to v2 to force an update
 const urlsToCache = [
   '/LLAVOREPOS/',
-  '/LLAVOREPOS/index.html',
-  '/LLAVOREPOS/manifest.json',
-  '/LLAVOREPOS/icons/icon-192x192.png',
-  '/LLAVOREPOS/icons/icon-512x512.png'
+  '/LLAVOREPOS/index.html'
 ];
 
+// Install the service worker and cache the essential app files
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
+// Serve files from the cache when offline
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
@@ -26,6 +24,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
+// Delete old caches on activation
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
