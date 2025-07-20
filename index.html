@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SoftDrinks POS - Final Version</title>
+    <style>
+        :root {
+            --primary: #00897b;
+            --primary-dark: #00695c; --secondary: #f0f2f5;
+            --text-dark: #263238; --text-light: #546e7a; --white: #ffffff;
+            --border-color: #e0e0e0; --danger: #d32f2f; --warning: #f39c12;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        background-color: var(--secondary); color: var(--text-dark); }
+        .app-container { width: 100%; max-width: 1400px;
+        margin: 0 auto; }
+        .header { background-color: var(--primary); padding: 15px 25px; display: flex;
+        justify-content: space-between; align-items: center; color: var(--white); position: sticky; top: 0; z-index: 100;
+        }
+        .header-title { font-size: 1.5em; font-weight: 700;
+        }
+        .btn {
+            background-color: var(--primary);
+            color: var(--white); border: none;
+            padding: 12px 18px; border-radius: 8px; cursor: pointer;
+            font-size: 1em; font-weight: 600; text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+        .btn:hover { opacity: 0.9;
+        }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed;
+        }
+        .btn-sm { padding: 8px 12px; font-size: 0.8em; text-transform: none;
+        }
+        .btn-secondary { background-color: var(--text-light);
+        }
+        .btn-danger { background-color: var(--danger);
+        }
+        .btn-warning { background-color: var(--warning);
+        }
+        .nav-buttons { display: flex; gap: 5px;
+        }
+        .nav-btn {
+            background-color: transparent;
+            color: var(--white);
+            border: 2px solid transparent; padding: 8px 16px; border-radius: 8px;
+            cursor: pointer; font-size: 1em; font-weight: 600;
+        }
+        .nav-btn.active { background-color: rgba(255,255,255,0.2);
+        }
+        .view { display: none;
+        }
+        .view.active { display: block;
+        }
+        .sales-view-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; padding: 25px;
+        }
+        .admin-view-panel { padding: 25px;
+        }
+        .card { background: var(--white); border-radius: 12px; padding: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .card-header { display:flex; justify-content:space-between; align-items:center;
+        margin-bottom:20px; flex-wrap: wrap; gap: 10px; }
+        .products-panel .search-bar { width: 100%; padding: 12px;
+        font-size: 1em; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px;
+        }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;
+        }
+        .product-card { border: 1px solid var(--border-color); border-radius: 12px; text-align: center; display: flex;
+        flex-direction: column; overflow: hidden; }
+        .product-card .name { font-weight: 600; padding: 10px;
+        }
+        .product-card .stock { color: var(--text-light); font-size: 0.9em; padding-bottom: 10px;
+        }
+        .product-actions { display: flex; gap: 0;
+        }
+        /* Style for product buttons to fit 1, 2, or 3 buttons */
+        .product-actions .btn {
+            flex: 1;
+            border-radius: 0;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+        .product-actions .btn:first-child { border-bottom-left-radius: 11px; }
+        .product-actions .btn:last-child { border-bottom-right-radius: 11px; border-right: none; }
+        .sale-panel { 
+            background: var(--white); /* Added solid background color */
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex; 
+            flex-direction: column; 
+            height: calc(100vh - 100px);
+        }
+        #cart-items { list-style: none; flex-grow: 1; overflow-y: auto;
+        }
+        .cart-item { display: flex; align-items: center; padding: 10px 0;
+        border-bottom: 1px solid var(--border-color); }
+        .cart-item-name { flex-grow: 1; font-weight: 500;
+        }
+        .cart-item-controls { display: flex; align-items: center; gap: 8px;
+        }
+        .cart-item-controls button { background: #eee; border: 1px solid #ccc; width: 28px;
+        height: 28px; border-radius: 50%; cursor: pointer; }
+        .cart-item-total { font-weight: bold; min-width: 80px;
+        text-align: right; }
+        .total-section { margin-top: auto; padding-top: 15px; border-top: 2px solid var(--primary);
+        }
+        .total-display, .change-display { display: flex; justify-content: space-between; font-size: 1.5em; font-weight: bold;
+        margin-bottom: 15px; }
+        .cash-received { width: 100%; padding: 12px; font-size: 1.1em; text-align: right;
+        border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; }
+        .sale-buttons .btn { width: 100%;
+        }
+        .accordion-item { background: var(--white); border-radius: 8px; margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .accordion-header { display: flex; justify-content: space-between;
+        align-items: center; padding: 20px; font-size: 1.2em; font-weight: 600; cursor: pointer;
+        }
+        .accordion-content { display: none; padding: 20px; border-top: 1px solid var(--border-color);
+        }
+        .data-table { width: 100%; border-collapse: collapse;
+        }
+        .data-table th, .data-table td { text-align: left; padding: 12px;
+        border-bottom: 1px solid var(--border-color); }
+        .data-table tr:hover { background-color: #fafafa; cursor: pointer;
+        }
+        .modal-fullscreen { display: none; position: fixed; top: 0; left: 0; width: 100%;
+        height: 100%; background-color: var(--secondary); z-index: 1001; overflow-y: auto; }
+        .modal-header { display: flex;
+        justify-content: space-between; align-items: center; padding: 15px 25px; background-color: var(--white); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .modal-body { padding: 25px;
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        .form-group { display: flex; flex-direction: column;
+        }
+        .form-group label { margin-bottom: 5px; font-size: 0.9em; color: var(--text-light);
+        }
+        .form-group input, .form-group select { padding: 12px; border: 1px solid var(--border-color);
+        border-radius: 8px; font-size: 1em; }
+        .form-group-full { grid-column: 1 / -1; }
+
+        /* --- MOBILE STYLES --- */
+        @media (max-width: 900px) {
+            .sales-view-grid { 
+                grid-template-columns: 1fr;
+                padding-bottom: 80px; /* Initial padding for collapsed footer */
+             } 
+             .sale-panel-container { 
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                z-index: 99;
+                height: var(--panel-height, 60px);
+                transition: height 0.3s ease-out;
+            }
+            .sale-panel {
+                height: 100%;
+                border-radius: 12px 12px 0 0;
+                box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+                margin-bottom: 0;
+                overflow: hidden;
+                padding: 0; /* Override card padding */
+            }
+            .sale-panel-header {
+                font-weight: bold;
+                padding: 8px 25px;
+                cursor: grab;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                border-bottom: 1px solid var(--border-color);
+                touch-action: none;
+            }
+            .sale-panel-header .drag-handle {
+                width: 40px;
+                height: 4px;
+                background-color: var(--border-color);
+                border-radius: 2px;
+                margin-bottom: 8px;
+            }
+            .sale-panel-content {
+                height: calc(100% - 60px); 
+                display: flex;
+                flex-direction: column;
+                padding: 0 25px 25px 25px;
+            }
+            .header-title { display: none; } 
+            .form-grid { grid-template-columns: 1fr; } 
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        </div>
+    <div id="modals-container"></div>
+
+    <script>
+        // --- DATA STATE & CONSTANTS ---
+        let products = [], cart = [], expenses = [], salesHistory = [], dailyReports = [], lastTransaction = {};
+        const currencySymbol = '₱';
+        const DB_VERSION = 'v70';
+
+        // --- APP INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+            renderAppShell();
+            showView('sales');
+        });
+        function loadAllData() {
+            products = JSON.parse(localStorage.getItem(`pos_products_${DB_VERSION}`) || '[]');
+            expenses = JSON.parse(localStorage.getItem(`pos_expenses_${DB_VERSION}`) || '[]');
+            salesHistory = JSON.parse(localStorage.getItem(`pos_salesHistory_${DB_VERSION}`) || '[]');
+            dailyReports = JSON.parse(localStorage.getItem(`pos_dailyReports_${DB_VERSION}`) || '[]');
+        }
+
+        function persist(key, data) { localStorage.setItem(`${key}_${DB_VERSION}`, JSON.stringify(data));
+        }
+        
+        // --- DRAGGABLE FOOTER LOGIC ---
+        function initializeDraggablePanel() {
+            const panelContainer = document.querySelector('.sale-panel-container');
+            const header = document.querySelector('.sale-panel-header');
+            const grid = document.querySelector('.sales-view-grid');
+            if (!header || !panelContainer || !grid) return;
+
+            const states = {
+                collapsed: 60,
+                partial: window.innerHeight * 0.45,
+                full: window.innerHeight - document.querySelector('.header').offsetHeight
+            };
+            let startY, startHeight, isDragging = false;
+
+            const setPanelState = (stateName) => {
+                const height = states[stateName];
+                panelContainer.style.transition = 'height 0.3s ease-out';
+                panelContainer.style.setProperty('--panel-height', `${height}px`);
+                grid.style.paddingBottom = `${height}px`;
+            };
+
+            const onTouchMove = (e) => {
+                if (!isDragging) return;
+                // No page scroll while dragging panel
+                e.preventDefault(); 
+                const newY = e.touches[0].clientY;
+                const deltaY = startY - newY;
+                let newHeight = startHeight + deltaY;
+                
+                newHeight = Math.max(states.collapsed, Math.min(newHeight, states.full));
+                panelContainer.style.setProperty('--panel-height', `${newHeight}px`);
+            };
+            
+            const onTouchEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                header.style.cursor = 'grab';
+                document.removeEventListener('touchmove', onTouchMove);
+                document.removeEventListener('touchend', onTouchEnd);
+                
+                const currentHeight = panelContainer.offsetHeight;
+                const distToCollapsed = Math.abs(currentHeight - states.collapsed);
+                const distToPartial = Math.abs(currentHeight - states.partial);
+                const distToFull = Math.abs(currentHeight - states.full);
+
+                if (distToCollapsed < distToPartial && distToCollapsed < distToFull) {
+                    setPanelState('collapsed');
+                } else if (distToPartial < distToFull) {
+                    setPanelState('partial');
+                } else {
+                    setPanelState('full');
+                }
+            };
+
+            const onTouchStart = (e) => {
+                isDragging = true;
+                panelContainer.style.transition = 'none';
+                startY = e.touches[0].clientY;
+                startHeight = panelContainer.offsetHeight;
+                header.style.cursor = 'grabbing';
+                // Add listeners to the whole document to capture movement anywhere on screen
+                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchend', onTouchEnd, { passive: false });
+            };
+
+            // Only start the drag if the touch begins on the header
+            header.addEventListener('touchstart', onTouchStart, { passive: true });
+
+            setPanelState('collapsed');
+        }
+
+
+        // --- VIEW MANAGEMENT ---
+        function renderAppShell() {
+            document.getElementById('app-container').innerHTML = `
+                <header class="header">
+                    <div class="header-title">SoftDrinks POS</div>
+                    <div class="nav-buttons">
+                         <button id="nav-sales" class="btn nav-btn" onclick="showView('sales')">Sales</button>
+                         <button id="nav-admin" class="btn nav-btn" onclick="showView('admin')">Admin</button>
+                    </div>
+                </header>
+               <main>
+                    <div id="sales-view" class="view"></div>
+                    <div id="admin-view" class="view"></div>
+                </main>`;
+        }
+        
+        function showView(viewId) {
+            document.querySelectorAll('.view, .nav-btn').forEach(el => el.classList.remove('active'));
+            const viewContainer = document.getElementById(`${viewId}-view`);
+            viewContainer.classList.add('active');
+            const navButton = document.getElementById(`nav-${viewId}`);
+            if (navButton) navButton.classList.add('active');
+            const renderers = { sales: renderSalesView, admin: renderAdminView };
+            if (renderers[viewId]) renderers[viewId]();
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderSalesView() {
+            const container = document.getElementById('sales-view');
+            container.innerHTML = `<div class="sales-view-grid">
+                <section class="products-panel card">
+                    <input type="search" id="product-search" class="search-bar" placeholder="🔍 Search products...">
+                    <div id="product-grid" class="product-grid"></div>
+                </section>
+                <div class="sale-panel-container">
+                    <div class="sale-panel">
+                        <div class="sale-panel-header">
+                            <div class="drag-handle"></div>
+                            <span>Current Sale</span>
+                        </div>
+                        <div class="sale-panel-content">
+                            <ul id="cart-items"></ul>
+                            <div class="total-section">
+                                <div class="total-display"><span>TOTAL</span><span id="cart-total">₱0.00</span></div>
+                                <div class="change-display" style="display: none;"><span>Change</span><span id="change-due">₱0.00</span></div>
+                                <input type="number" id="cash-received" class="cash-received" placeholder="Cash Received">
+                                <div id="sale-buttons" class="sale-buttons"><button id="process-sale-btn" class="btn" onclick="processSale()">Process Sale</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            renderProducts();
+            renderCart();
+            document.getElementById('product-search').addEventListener('input', (e) => renderProducts(e.target.value));
+            initializeDraggablePanel();
+        }
+
+        function renderProducts(searchTerm = '') {
+            const grid = document.getElementById('product-grid');
+            if (!grid) return;
+            const filteredProducts = products.filter(p => p.name.toLowerCase().includes((searchTerm || '').toLowerCase()));
+            grid.innerHTML = (filteredProducts.length > 0) ?
+            filteredProducts.map(p => {
+                const casePrice = p.caseSellPrice > 0 ? p.caseSellPrice : (p.sellPrice * p.unitsPerCase);
+                const cases = Math.floor(p.unitsPerCase > 0 ? p.stock / p.unitsPerCase : 0);
+                const units = p.unitsPerCase > 0 ? p.stock % p.unitsPerCase : p.stock;
+                
+                let halfCaseButton = '';
+                if (p.unitsPerHalfCase > 0 && p.halfCaseSellPrice > 0) {
+                    halfCaseButton = `<button class="btn btn-sm btn-warning" onclick="addToCart(${p.id}, 'half-case')" ${p.stock < p.unitsPerHalfCase ? 'disabled' : ''}>Half-Case<br>${currencySymbol}${p.halfCaseSellPrice.toFixed(2)}</button>`;
+                }
+
+                return `<div class="product-card">
+                   <div class="name">${p.name}</div>
+                    <div class="stock">Stock: ${cases} ${p.caseName}(s), ${units} ${p.unitName}(s)</div>
+                    <div class="product-actions">
+                         <button class="btn btn-sm" style="background-color: var(--primary-dark);" onclick="addToCart(${p.id}, 'unit')" ${p.stock < 1 ? 'disabled' : ''}>${p.unitName}<br>${currencySymbol}${p.sellPrice.toFixed(2)}</button>
+                         ${halfCaseButton}
+                          <button class="btn btn-sm btn-secondary" onclick="addToCart(${p.id}, 'case')" ${p.stock < p.unitsPerCase ? 'disabled' : ''}>${p.caseName}<br>${currencySymbol}${casePrice.toFixed(2)}</button>
+                    </div></div>`;
+            }).join('') : '<p>No products found. Add products in the Admin view.</p>';
+        }
+
+        function renderCart() {
+            const cartItemsEl = document.getElementById('cart-items');
+            const cartTotalEl = document.getElementById('cart-total');
+            if (!cartItemsEl || !cartTotalEl) return;
+            let total = cart.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0);
+            cartItemsEl.innerHTML = (cart.length > 0) ? cart.map(item => `
+                <li class="cart-item">
+                    <span class="cart-item-name">${item.name}</span>
+                    <div class="cart-item-controls">
+                        <button onclick="decreaseCartItem('${item.cartItemId}')">-</button>
+                         <span>${item.quantity}</span>
+                        <button onclick="increaseCartItem('${item.cartItemId}')">+</button>
+                        <button class="remove-btn" onclick="removeCartItem('${item.cartItemId}')">🗑️</button>
+                    </div>
+               <span class="cart-item-total">${currencySymbol}${(item.sellPrice * item.quantity).toFixed(2)}</span>
+                </li>`).join('') : '<li style="text-align:center; padding: 20px 0; color: var(--text-light);">Cart is empty</li>';
+            cartTotalEl.textContent = `${currencySymbol}${total.toFixed(2)}`;
+        }
+
+        function renderAdminView() {
+            const container = document.getElementById('admin-view');
+            container.innerHTML = `<div id="admin-accordion" class="admin-view-panel">
+                <div class="accordion-item"><div class="accordion-header" onclick="openInventoryView()"><span>📦 Manage Products</span><span>▶</span></div></div>
+                ${createAccordionItem('sales', '🧾 Sales History', renderSalesHistory())}
+                ${createAccordionItem('expenses', '💸 Expenses Log', renderExpensesLog())}
+                ${createAccordionItem('reports', '📈 End of Day Reports', renderReportsLog())}
+            </div>`;
+            container.querySelectorAll('.accordion-header').forEach(header => {
+                if (header.getAttribute('onclick')) return;
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+               });
+            });
+        }
+        
+        function createAccordionItem(id, title, content) {
+            return `<div class="accordion-item" id="${id}"><div class="accordion-header"><span>${title}</span><span>▼</span></div><div class="accordion-content">${content}</div></div>`;
+        }
+        
+        function renderSalesHistory() {
+            return `<div class="card-header" style="padding:0; margin-bottom:20px;"><h3 style="margin:0;">Recent Transactions</h3><button class="btn btn-sm" onclick="exportToCsv('sales_history.csv', salesHistory)">Export (CSV)</button></div>
+            <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Items</th><th>Total</th><th>Action</th></tr></thead>
+            <tbody>${[...salesHistory].reverse().map(t => `<tr><td>${new Date(t.date).toLocaleString()}</td><td>${t.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td><td>${currencySymbol}${t.total.toFixed(2)}</td><td><button class="btn btn-sm" onclick='reprintReceipt(${t.id})'>Reprint</button></td></tr>`).join('')}</tbody>
+        </table></div>`;
+        }
+
+        function renderExpensesLog() {
+             return `<div class="card-header" style="padding:0; margin-bottom:20px;"><h3 style="margin:0;">All Expenses</h3></div>
+             <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody>${[...expenses].reverse().map(e => `<tr><td>${new Date(e.date).toLocaleDateString()}</td><td>${e.description}</td><td>${currencySymbol}${e.amount.toFixed(2)}</td><td style="color:${(e.status || '').toLowerCase() === 'paid' ? 'var(--primary)' : 'var(--danger)'}; font-weight: bold;">${e.status}</td></tr>`).join('')}</tbody>
+            </table></div>`;
+        }
+
+        function renderReportsLog() {
+            const today = new Date().toISOString().slice(0, 10);
+            const reportExists = dailyReports.some(r => r.id === today);
+            return `<div class="card-header" style="padding:0; margin-bottom:20px;">
+                <h3 style="margin:0;">Daily Financial Summaries</h3>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-sm" onclick="exportToCsv('daily_reports.csv', dailyReports)">Export (CSV)</button>
+                    <button class="btn btn-sm" onclick="generateEODReport()" ${reportExists ? 'disabled' : ''}>${reportExists ? "Today's Report Generated" : 'Generate EOD Report'}</button>
+                </div>
+            </div>
+            <div id="eod-summary" style="margin-bottom:20px;"></div><div style="overflow-x:auto;"><table class="data-table">
+                <thead><tr><th>Date</th><th>Total Sales</th><th>Net Income</th><th>Action</th></tr></thead>
+                <tbody>${[...dailyReports].reverse().map(r => `<tr><td>${new Date(r.date).toLocaleDateString()}</td><td>${currencySymbol}${r.totalSales.toFixed(2)}</td><td style="color:${r.netIncome >= 0 ? 'var(--primary)' : 'var(--danger)'}; font-weight:bold;">${currencySymbol}${r.netIncome.toFixed(2)}</td><td><button class="btn btn-sm" onclick="viewReport('${r.id}')">View Details</button></td></tr>`).join('')}</tbody>
+            </table></div>`;
+        }
+        
+        // --- CORE LOGIC (omitted for brevity, no changes from previous version) ---
+        function addToCart(productId, type) { if (document.getElementById('process-sale-btn')?.disabled) return; const product = products.find(p => p.id === productId); const cartItemId = `${productId}-${type}`; let unitsPerItem; if (type === 'case') { unitsPerItem = product.unitsPerCase; } else if (type === 'half-case') { unitsPerItem = product.unitsPerHalfCase; } else { unitsPerItem = 1; } if (!product || product.stock < unitsPerItem) { alert('Not enough stock!'); return; } const existingCartItem = cart.find(item => item.cartItemId === cartItemId); if (existingCartItem) { let totalUnitsInCartForThisProduct = 0; cart.forEach(item => { if (item.id === productId) { let units = 1; if (item.type === 'case') units = item.unitsPerCase; else if (item.type === 'half-case') units = item.unitsPerHalfCase; totalUnitsInCartForThisProduct += item.quantity * units; } }); if (product.stock >= totalUnitsInCartForThisProduct + unitsPerItem) { existingCartItem.quantity++; } else { alert('Not enough stock to add another ' + type); return; } } else { let price, name; if (type === 'case') { price = product.caseSellPrice > 0 ? product.caseSellPrice : (product.sellPrice * product.unitsPerCase); name = `${product.name} (${product.caseName})`; } else if (type === 'half-case') { price = product.halfCaseSellPrice; name = `${product.name} (Half-Case)`; } else { price = product.sellPrice; name = `${product.name} (${product.unitName})`; } cart.push({ ...product, cartItemId: cartItemId, type: type, name: name, sellPrice: price, quantity: 1 }); } renderCart(); }
+        function decreaseCartItem(cartItemId) { const cartItem = cart.find(item => item.cartItemId === cartItemId); if (cartItem) { cartItem.quantity--; if (cartItem.quantity <= 0) removeCartItem(cartItemId); else renderCart(); } }
+        function increaseCartItem(cartItemId) { const cartItem = cart.find(item => item.cartItemId === cartItemId); if(cartItem) { addToCart(cartItem.id, cartItem.type); } }
+        function removeCartItem(cartItemId) { cart = cart.filter(item => item.cartItemId !== cartItemId); renderCart(); }
+        function processSale() { if (cart.length === 0) return; const cashReceivedEl = document.getElementById('cash-received'); const cash = parseFloat(cashReceivedEl.value); const total = cart.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0); if (isNaN(cash) || cash < total) { alert('Cash received is less than total.'); return; } const change = cash - total; document.querySelector('.change-display').style.display = 'flex'; document.getElementById('change-due').textContent = `${currencySymbol}${change.toFixed(2)}`; document.getElementById('process-sale-btn').disabled = true; cashReceivedEl.disabled = true; document.getElementById('sale-buttons').innerHTML = `<button class="btn btn-secondary" onclick="printReceipt()">Print Receipt</button><button class="btn" onclick="newSale()">New Sale</button>`; lastTransaction = { id: Date.now(), items: [...cart], total, cash, change, date: new Date().toISOString() }; salesHistory.push(lastTransaction); persist('pos_salesHistory', salesHistory); cart.forEach(cartItem => { const product = products.find(p => p.id === cartItem.id); if (product) { let unitsToDeduct = 0; if(cartItem.type === 'case') { unitsToDeduct = cartItem.quantity * product.unitsPerCase; } else if (cartItem.type === 'half-case') { unitsToDeduct = cartItem.quantity * product.unitsPerHalfCase; } else { unitsToDeduct = cartItem.quantity; } product.stock -= unitsToDeduct; } }); persist('pos_products', products); }
+        function newSale() { cart = []; lastTransaction = {}; renderCart(); const cashReceivedEl = document.getElementById('cash-received'); if(cashReceivedEl) { cashReceivedEl.value = ''; cashReceivedEl.disabled = false; } const changeDisplay = document.querySelector('.change-display'); if(changeDisplay) changeDisplay.style.display = 'none'; const saleButtons = document.getElementById('sale-buttons'); if(saleButtons) saleButtons.innerHTML = `<button id="process-sale-btn" class="btn" onclick="processSale()">Process Sale</button>`; renderProducts(); }
+        function openInventoryView() { const modalHTML = `<div class="modal-fullscreen" id="inventory-modal" style="display:block;"> <header class="modal-header"> <h3 style="color:var(--primary);">Manage Products</h3> <button class="btn" onclick="closeModal('inventory-modal')">← Back to Admin</button> </header> <div class="modal-body"><div class="card"> <div class="card-header"> <h3 style="margin:0;">All Products</h3> <div style="display:flex; gap:10px;"> <button class="btn btn-sm" onclick="triggerImport()">Import</button> <button class="btn btn-sm" onclick="exportToCsv('inventory.csv', products)">Export</button> <button class="btn btn-sm" onclick="openProductModal()">+ Add Product</button> </div> </div> <div style="overflow-x:auto;"><table class="data-table"> <thead><tr><th>Product</th><th>Stock</th></tr></thead> <tbody id="inventory-table-body">${renderInventoryTableBody()}</tbody> </table></div> </div></div> </div>`; document.getElementById('modals-container').innerHTML = modalHTML; }
+        function renderInventoryTableBody() { return products.map(p => { const cases = Math.floor(p.unitsPerCase > 0 ? p.stock / p.unitsPerCase : 0); const units = p.unitsPerCase > 0 ? p.stock % p.unitsPerCase : p.stock; return `<tr onclick="openProductDetails(${p.id})"> <td><strong>${p.name}</strong><br><small>${p.unitsPerCase} ${p.unitName}(s) per ${p.caseName}</small></td> <td><strong>${cases}</strong> ${p.caseName}s<br><small>+ <strong>${units}</strong> ${p.unitName}(s)</small></td> </tr>`; }).join(''); }
+        function openProductDetails(productId) { const product = products.find(p => p.id === Number(productId)); if (!product) { console.error("Product not found for ID:", productId); return; } const cases = Math.floor(product.unitsPerCase > 0 ? product.stock / product.unitsPerCase : 0); const units = product.unitsPerCase > 0 ? product.stock % product.unitsPerCase : p.stock; const detailViewHTML = `<div class="modal-fullscreen" id="product-detail-view" style="display:block;"> <header class="modal-header"> <h3 style="color:var(--primary);">${product.name}</h3> <button class="btn" onclick="closeModal('product-detail-view'); openInventoryView();">← Back to List</button> </header> <div class="modal-body"> <div class="card"><h2>Current Stock</h2><p style="font-size: 2em; font-weight: bold;">${cases} ${product.caseName}s + ${units} ${product.unitName}(s)</p><small>Total: ${product.stock} ${product.unitName}(s)</small></div> <div class="card"><h2>Add Stock</h2><div class="form-grid"> <div class="form-group"><label>Add Units</label><input type="number" id="add-unit-detail" placeholder="0"></div> <div class="form-group"><label>Add Cases</label><input type="number" id="add-case-detail" placeholder="0"></div> <div class="form-group"><label>Payment Status</label><select id="payment-status-detail" class="form-group"><option>Paid</option><option>Unpaid</option></select></div> <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addStockFromDetail(${productId})">Add Stock</button></div> </div></div> <div class="card"><h2>Manage Product</h2><div style="display:flex; gap:10px;"> <button class="btn btn-warning" onclick="openProductModal(${productId})">Edit Details</button> <button class="btn btn-danger" onclick="deleteProduct(${productId})">Delete Product</button> </div></div> </div></div>`; document.getElementById('modals-container').innerHTML = detailViewHTML; }
+        function addStockFromDetail(id) { const product = products.find(p => p.id === id); const unitQty = parseInt(document.getElementById(`add-unit-detail`).value) || 0; const caseQty = parseInt(document.getElementById(`add-case-detail`).value) || 0; const paymentStatus = document.getElementById(`payment-status-detail`).value; const totalQty = unitQty + (caseQty * product.unitsPerCase); if (totalQty > 0) { product.stock += totalQty; persist('pos_products', products); const cost = totalQty * product.purchasePrice; if (cost > 0) { expenses.push({ id: Date.now(), date: new Date().toISOString(), description: `Purchase: ${totalQty} x ${product.name}`, amount: cost, status: paymentStatus }); persist('pos_expenses', expenses); } openProductDetails(id); alert(`${totalQty} ${product.unitName}(s) added.`); } }
+        function deleteProduct(id) { if (confirm('Are you sure?')) { products = products.filter(p => p.id !== id); persist('pos_products', products); closeModal('product-detail-view'); openInventoryView(); renderProducts(); } }
+        function openProductModal(id = null) { const p = id ? products.find(p => p.id === Number(id)) : {}; const modalHTML = `<div class="modal-fullscreen" id="product-modal" style="display:block;"> <header class="modal-header"> <h3 style="color:var(--primary);">${id ? 'Edit' : 'Add New'} Product</h3> <button class="btn btn-danger" onclick="closeModal('product-modal')">Cancel</button> </header> <div class="modal-body"><form id="product-form" class="form-grid card"> <input type="hidden" id="product-id" value="${p.id || ''}"> <div class="form-group form-group-full"><label>Product Name</label><input type="text" id="product-name" value="${p.name || ''}" required></div> <div class="form-group"><label>Unit Name</label><input type="text" id="unit-name" value="${p.unitName || 'Bottle'}" required></div> <div class="form-group"><label>Sell Price/Unit</label><input type="number" id="sell-price" value="${p.sellPrice || ''}" required step="0.01"></div> <div class="form-group"><label>Units/Half-Case</label><input type="number" id="units-per-half-case" value="${p.unitsPerHalfCase || 12}"></div> <div class="form-group"><label>Sell Price/Half-Case (Fixed)</label><input type="number" id="half-case-sell-price" value="${p.halfCaseSellPrice || ''}" step="0.01"></div> <div class="form-group"><label>Case Name</label><input type="text" id="case-name" value="${p.caseName || 'Case'}" required></div> <div class="form-group"><label>Units/Case</label><input type="number" id="units-per-case" value="${p.unitsPerCase || 24}" required></div> <div class="form-group"><label>Purchase Price/Case</label><input type="number" id="purchase-price-case" value="${p.purchasePriceCase || 0}" required step="0.01"></div> <div class="form-group"><label>Sell Price/Case (Fixed)</label><input type="number" id="case-sell-price" value="${p.caseSellPrice || ''}" step="0.01" placeholder="Auto-calculates if blank"></div> <div class="form-group form-group-full" style="margin-top:10px;"> <button type="submit" class="btn" style="width:100%; padding: 15px; font-size: 1.2em;">${id ? 'Save Changes' : 'Add Product'}</button> </div> </form></div> </div>`; document.getElementById('modals-container').innerHTML = modalHTML; document.getElementById('product-form').addEventListener('submit', saveProduct); }
+        function saveProduct(e) { e.preventDefault(); const id = document.getElementById('product-id').value; const unitsPerCase = parseInt(document.getElementById('units-per-case').value) || 1; const purchasePriceCase = parseFloat(document.getElementById('purchase-price-case').value) || 0; const purchasePriceUnit = (unitsPerCase > 0) ? (purchasePriceCase / unitsPerCase) : 0; const productData = { name: document.getElementById('product-name').value, unitName: document.getElementById('unit-name').value, caseName: document.getElementById('case-name').value, unitsPerCase: unitsPerCase, purchasePriceCase: purchasePriceCase, purchasePrice: purchasePriceUnit, sellPrice: parseFloat(document.getElementById('sell-price').value), caseSellPrice: parseFloat(document.getElementById('case-sell-price').value) || 0, unitsPerHalfCase: parseInt(document.getElementById('units-per-half-case').value) || 0, halfCaseSellPrice: parseFloat(document.getElementById('half-case-sell-price').value) || 0 }; if (id) { const index = products.findIndex(p => p.id == id); productData.stock = products[index].stock; products[index] = { ...products[index], ...productData }; } else { products.push({ id: Date.now(), stock: 0, ...productData }); } persist('pos_products', products); closeModal('product-modal'); openInventoryView(); renderProducts(); }
+        function printReceipt() { sendToRawBT(lastTransaction); }
+        function reprintReceipt(transactionId) { const transaction = salesHistory.find(t => t.id === transactionId); if (transaction) sendToRawBT(transaction); }
+        function sendToRawBT(transaction) { try { const receiptText = generateReceiptText(transaction); const encodedText = encodeURIComponent(receiptText); window.location.href = `rawbt:${encodedText}`; } catch (e) { alert("Printing failed. Please ensure RawBT app is installed."); console.error(e); } }
+        function generateReceiptText(transaction) { const { items, total, cash, change, date } = transaction; const divider = '--------------------------------\n'; let receiptText = `Date: ${new Date(date).toLocaleString()}\n${divider}`; items.forEach(item => { const itemTotal = `P${(item.sellPrice * item.quantity).toFixed(2)}`; const itemLine = `${item.quantity}x ${item.name}`; const totalChars = 32; const padding = totalChars - itemLine.length - itemTotal.length; receiptText += itemLine + ' '.repeat(Math.max(1, padding)) + itemTotal + '\n'; }); receiptText += divider; const labelWidth = 10; receiptText += 'Total:'.padEnd(labelWidth) + `P${total.toFixed(2)}\n`; if (cash !== undefined) receiptText += 'Cash:'.padEnd(labelWidth) + `P${cash.toFixed(2)}\n`; if (change !== undefined) receiptText += 'Change:'.padEnd(labelWidth) + `P${change.toFixed(2)}\n`; receiptText += `${divider}Thank you!\n\n\n\n`; return receiptText; }
+        function closeModal(modalId) { const modal = document.getElementById(modalId); if(modal) modal.remove(); }
+        function generateEODReport() { const todayStr = new Date().toISOString().slice(0, 10); if (dailyReports.some(r => r.id === todayStr)) { alert('Report already generated for today.'); return; } const todaysTransactions = salesHistory.filter(t => new Date(t.date).toISOString().slice(0, 10) === todayStr); const totalSales = todaysTransactions.reduce((sum, tx) => sum + tx.total, 0); const costOfGoodsSold = todaysTransactions.reduce((sum, tx) => { const txCost = tx.items.reduce((itemSum, item) => { let unitsSold = 0; if(item.type === 'case') unitsSold = item.quantity * item.unitsPerCase; else if (item.type === 'half-case') unitsSold = item.quantity * item.unitsPerHalfCase; else unitsSold = item.quantity; return itemSum + (item.purchasePrice * unitsSold); }, 0); return sum + txCost; }, 0); const grossProfit = totalSales - costOfGoodsSold; const todayExpenses = expenses.filter(e => new Date(e.date).toISOString().slice(0, 10) === todayStr).reduce((sum, e) => sum + e.amount, 0); const netIncome = grossProfit - todayExpenses; const report = { id: todayStr, date: new Date().toISOString(), totalSales, costOfGoodsSold, grossProfit, todayExpenses, netIncome, salesData: JSON.parse(JSON.stringify(todaysTransactions)) }; dailyReports.push(report); persist('pos_dailyReports', dailyReports); alert('End of Day Report Generated!'); renderReportsLog(); viewReport(report.id); }
+        function viewReport(reportId) { const report = dailyReports.find(r => r.id === reportId); const summaryContainer = document.getElementById('eod-summary'); if (!report || !summaryContainer) return; const reportMetric = (label, value, isProfitLoss = false) => `<div style="display:flex; justify-content:space-between; font-size:1.2em; padding:10px; border-bottom:1px solid #eee;"><span style="color:#555;">${label}</span> <span style="font-weight:bold; color:${isProfitLoss ? (value >= 0 ? 'var(--primary)' : 'var(--danger)') : 'var(--text-dark)'};">${currencySymbol}${value.toFixed(2)}</span></div>`; summaryContainer.innerHTML = `<h3>Report for ${new Date(report.date).toLocaleDateString()}</h3> ${reportMetric('Total Sales', report.totalSales)} ${reportMetric('Cost of Goods', -report.costOfGoodsSold)} ${reportMetric('Gross Profit', report.grossProfit, true)} ${reportMetric('Total Expenses', -report.todayExpenses)} <div style="border-top:2px solid #333; margin-top:10px;">${reportMetric('Net Income', report.netIncome, true)}</div>`; }
+        function exportToCsv(filename, data) { if (data.length === 0) { alert('No data to export.'); return; } const headers = Object.keys(data[0]); const headerRow = headers.join(',') + '\n'; const dataRows = data.map(row => { return headers.map(header => { let cell = row[header]; if (Array.isArray(cell)) { if (header === 'items') cell = cell.map(i => `${i.quantity}x ${i.name}`).join('; '); else if (header === 'salesData') cell = `${cell.length} transaction(s)`; } return JSON.stringify(cell || '', /"/g, '""'); }).join(','); }).join('\n'); const blob = new Blob([headerRow + dataRows], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); const url = URL.createObjectURL(blob); link.setAttribute('href', url); link.setAttribute('download', filename); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+        function triggerImport() { if (!confirm('This will overwrite all current products. Make sure you have a backup. Continue?')) { return; } const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.csv'; fileInput.onchange = importProducts; fileInput.click(); }
+        function importProducts(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { const text = e.target.result; try { const parsedProducts = parseCsv(text); if (parsedProducts.length > 0) { products = parsedProducts; persist('pos_products', products); alert(`Successfully imported ${products.length} products!`); openInventoryView(); renderProducts(); } else { alert('Could not find valid product data in the file.'); } } catch (error) { alert(`An error occurred: ${error.message}`); } }; reader.readAsText(file); }
+        function parseCsv(csvText) { const lines = csvText.trim().split(/\r\n|\n/); if (lines.length < 2) return []; const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '')); const requiredHeaders = ['name', 'sellPrice', 'unitsPerCase', 'purchasePriceCase']; if (!requiredHeaders.every(h => headers.includes(h))) { throw new Error('CSV file is missing required headers: ' + requiredHeaders.join(', ')); } const newProducts = []; for (let i = 1; i < lines.length; i++) { if (!lines[i]) continue; const values = lines[i].split(',').map(v => v.trim().replace(/"/g, '')); let productObj = {}; headers.forEach((header, index) => { productObj[header] = values[index]; }); const unitsPerCase = parseInt(productObj.unitsPerCase) || 1; const purchasePriceCase = parseFloat(productObj.purchasePriceCase) || 0; productObj = { ...productObj, id: Date.now() + i, stock: parseInt(productObj.stock) || 0, unitsPerCase: unitsPerCase, purchasePriceCase: purchasePriceCase, purchasePrice: (unitsPerCase > 0) ? (purchasePriceCase / unitsPerCase) : 0, sellPrice: parseFloat(productObj.sellPrice), caseSellPrice: parseFloat(productObj.caseSellPrice) || 0, unitsPerHalfCase: parseInt(productObj.unitsPerHalfCase) || 0, halfCaseSellPrice: parseFloat(productObj.halfCaseSellPrice) || 0 }; if (productObj.name && !isNaN(productObj.sellPrice)) { newProducts.push(productObj); } } return newProducts; }
+
+    </script>
+</body>
+</html>
