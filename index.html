@@ -1,195 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>SoftDrinks POS - Final Version</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
-            --primary: #00897b;
-            --primary-dark: #00695c; --secondary: #f0f2f5;
+            --primary: #00897b; --primary-dark: #00695c; --secondary: #f0f2f5;
             --text-dark: #263238; --text-light: #546e7a; --white: #ffffff;
-            --border-color: #e0e0e0; --danger: #d32f2f; --warning: #f39c12;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0;
-        }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        background-color: var(--secondary); color: var(--text-dark); }
-        .app-container { width: 100%; max-width: 1400px;
-        margin: 0 auto; }
-        .header { background-color: var(--primary); padding: 15px 25px; display: flex;
-        justify-content: space-between; align-items: center; color: var(--white); position: sticky; top: 0; z-index: 100;
-        }
-        .header-title { font-size: 1.5em; font-weight: 700;
-        }
+            --border-color: #e0e0e0; --danger: #d32f2f; --warning: #f39c12; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: var(--secondary); color: var(--text-dark); }
+        .app-container { width: 100%; max-width: 1400px; margin: 0 auto; }
+        .header { background-color: var(--primary); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; color: var(--white); position: sticky; top: 0; z-index: 100; }
+        .header-title { font-size: 1.5em; font-weight: 700; }
         .btn {
-            background-color: var(--primary);
-            color: var(--white); border: none;
+            background-color: var(--primary); color: var(--white); border: none;
             padding: 12px 18px; border-radius: 8px; cursor: pointer;
-            font-size: 1em; font-weight: 600; text-transform: uppercase;
-            transition: all 0.2s ease;
+            font-size: 1em; font-weight: 600; text-transform: uppercase; transition: all 0.2s ease;
         }
-        .btn:hover { opacity: 0.9;
-        }
-        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed;
-        }
-        .btn-sm { padding: 8px 12px; font-size: 0.8em; text-transform: none;
-        }
-        .btn-secondary { background-color: var(--text-light);
-        }
-        .btn-danger { background-color: var(--danger);
-        }
-        .btn-warning { background-color: var(--warning);
-        }
-        .nav-buttons { display: flex; gap: 5px;
-        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .btn-sm { padding: 8px 12px; font-size: 0.8em; text-transform: none; }
+        .btn-secondary { background-color: var(--text-light); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-warning { background-color: var(--warning); }
+        .nav-buttons { display: flex; gap: 5px; }
         .nav-btn {
-            background-color: transparent;
-            color: var(--white);
+            background-color: transparent; color: var(--white);
             border: 2px solid transparent; padding: 8px 16px; border-radius: 8px;
-            cursor: pointer; font-size: 1em; font-weight: 600;
-        }
-        .nav-btn.active { background-color: rgba(255,255,255,0.2);
-        }
-        .view { display: none;
-        }
-        .view.active { display: block;
-        }
-        .sales-view-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; padding: 25px;
-        }
-        .admin-view-panel { padding: 25px;
-        }
-        .card { background: var(--white); border-radius: 12px; padding: 25px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .card-header { display:flex; justify-content:space-between; align-items:center;
-        margin-bottom:20px; flex-wrap: wrap; gap: 10px; }
-        .products-panel .search-bar { width: 100%; padding: 12px;
-        font-size: 1em; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px;
-        }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;
-        }
-        .product-card { border: 1px solid var(--border-color); border-radius: 12px; text-align: center; display: flex;
-        flex-direction: column; overflow: hidden; }
-        .product-card .name { font-weight: 600; padding: 10px;
-        }
-        .product-card .stock { color: var(--text-light); font-size: 0.9em; padding-bottom: 10px;
-        }
-        .product-actions { display: flex; gap: 0;
-        }
-        /* Style for product buttons to fit 1, 2, or 3 buttons */
+            cursor: pointer; font-size: 1em; font-weight: 600; }
+        .nav-btn.active { background-color: rgba(255,255,255,0.2); }
+        .view { display: none; }
+        .view.active { display: block; }
+        .sales-view-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; padding: 25px; }
+        .admin-view-panel { padding: 25px; }
+        .card { background: var(--white); border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap: wrap; gap: 10px; }
+        .products-panel .search-bar { width: 100%; padding: 12px; font-size: 1em; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .product-card { border: 1px solid var(--border-color); border-radius: 12px; text-align: center; display: flex; flex-direction: column; overflow: hidden; }
+        .product-card .name { font-weight: 600; padding: 10px; }
+        .product-card .stock { color: var(--text-light); font-size: 0.9em; padding-bottom: 10px; }
+        .product-actions { display: flex; gap: 0; }
         .product-actions .btn {
-            flex: 1;
-            border-radius: 0;
+            flex: 1; border-radius: 0;
             border-right: 1px solid rgba(255,255,255,0.2);
         }
         .product-actions .btn:first-child { border-bottom-left-radius: 11px; }
         .product-actions .btn:last-child { border-bottom-right-radius: 11px; border-right: none; }
         .sale-panel { 
-            background: var(--white); /* Added solid background color */
-            border-radius: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            display: flex; 
-            flex-direction: column; 
-            height: calc(100vh - 100px);
-        }
-        #cart-items { list-style: none; flex-grow: 1; overflow-y: auto;
-        }
-        .cart-item { display: flex; align-items: center; padding: 10px 0;
-        border-bottom: 1px solid var(--border-color); }
-        .cart-item-name { flex-grow: 1; font-weight: 500;
-        }
-        .cart-item-controls { display: flex; align-items: center; gap: 8px;
-        }
-        .cart-item-controls button { background: #eee; border: 1px solid #ccc; width: 28px;
-        height: 28px; border-radius: 50%; cursor: pointer; }
-        .cart-item-total { font-weight: bold; min-width: 80px;
-        text-align: right; }
-        .total-section { margin-top: auto; padding-top: 15px; border-top: 2px solid var(--primary);
-        }
-        .total-display, .change-display { display: flex; justify-content: space-between; font-size: 1.5em; font-weight: bold;
-        margin-bottom: 15px; }
-        .cash-received { width: 100%; padding: 12px; font-size: 1.1em; text-align: right;
-        border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; }
-        .sale-buttons .btn { width: 100%;
-        }
-        .accordion-item { background: var(--white); border-radius: 8px; margin-bottom: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .accordion-header { display: flex; justify-content: space-between;
-        align-items: center; padding: 20px; font-size: 1.2em; font-weight: 600; cursor: pointer;
-        }
-        .accordion-content { display: none; padding: 20px; border-top: 1px solid var(--border-color);
-        }
-        .data-table { width: 100%; border-collapse: collapse;
-        }
-        .data-table th, .data-table td { text-align: left; padding: 12px;
-        border-bottom: 1px solid var(--border-color); }
-        .data-table tr:hover { background-color: #fafafa; cursor: pointer;
-        }
-        .modal-fullscreen { display: none; position: fixed; top: 0; left: 0; width: 100%;
-        height: 100%; background-color: var(--secondary); z-index: 1001; overflow-y: auto; }
-        .modal-header { display: flex;
-        justify-content: space-between; align-items: center; padding: 15px 25px; background-color: var(--white); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .modal-body { padding: 25px;
-        }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-        }
-        .form-group { display: flex; flex-direction: column;
-        }
-        .form-group label { margin-bottom: 5px; font-size: 0.9em; color: var(--text-light);
-        }
-        .form-group input, .form-group select { padding: 12px; border: 1px solid var(--border-color);
-        border-radius: 8px; font-size: 1em; }
+            background: var(--white);
+            border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; 
+            height: calc(100vh - 100px); }
+        #cart-items { list-style: none; flex-grow: 1; overflow-y: auto; }
+        .cart-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .cart-item-name { flex-grow: 1; font-weight: 500; }
+        .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+        .cart-item-controls button { background: #eee; border: 1px solid #ccc; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; }
+        .cart-item-total { font-weight: bold; min-width: 80px; text-align: right; }
+        .total-section { margin-top: auto; padding-top: 15px; border-top: 2px solid var(--primary); }
+        .total-display, .change-display { display: flex; justify-content: space-between; font-size: 1.5em; font-weight: bold; margin-bottom: 15px; }
+        .cash-received { width: 100%; padding: 12px; font-size: 1.1em; text-align: right; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; }
+        .sale-buttons .btn { width: 100%; }
+        .accordion-item { background: var(--white); border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; font-size: 1.2em; font-weight: 600; cursor: pointer; }
+        .accordion-content { display: none; padding: 20px; border-top: 1px solid var(--border-color); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-color); }
+        .data-table tr:hover { background-color: #fafafa; cursor: pointer; }
+        .modal-fullscreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--secondary); z-index: 1001; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background-color: var(--white); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .modal-body { padding: 25px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-size: 0.9em; color: var(--text-light); }
+        .form-group input, .form-group select { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1em; }
         .form-group-full { grid-column: 1 / -1; }
 
-        /* --- MOBILE STYLES --- */
         @media (max-width: 900px) {
             .sales-view-grid { 
-                grid-template-columns: 1fr;
-                padding-bottom: 80px; /* Initial padding for collapsed footer */
+                grid-template-columns: 1fr; padding-bottom: 80px;
              } 
              .sale-panel-container { 
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                z-index: 99;
-                height: var(--panel-height, 60px);
+                position: fixed; bottom: 0;
+                left: 0; right: 0; width: 100%;
+                z-index: 99; height: var(--panel-height, 60px);
                 transition: height 0.3s ease-out;
-            }
+             }
             .sale-panel {
-                height: 100%;
-                border-radius: 12px 12px 0 0;
+                height: 100%; border-radius: 12px 12px 0 0;
                 box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
-                margin-bottom: 0;
-                overflow: hidden;
-                padding: 0; /* Override card padding */
+                margin-bottom: 0; overflow: hidden; padding: 0;
             }
             .sale-panel-header {
-                font-weight: bold;
-                padding: 8px 25px;
-                cursor: grab;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
+                font-weight: bold; padding: 8px 25px; cursor: grab;
+                display: flex; flex-direction: column;
+                justify-content: center; align-items: center;
                 border-bottom: 1px solid var(--border-color);
                 touch-action: none;
             }
             .sale-panel-header .drag-handle {
-                width: 40px;
-                height: 4px;
+                width: 40px; height: 4px;
                 background-color: var(--border-color);
-                border-radius: 2px;
-                margin-bottom: 8px;
+                border-radius: 2px; margin-bottom: 8px;
             }
             .sale-panel-content {
-                height: calc(100% - 60px); 
-                display: flex;
-                flex-direction: column;
-                padding: 0 25px 25px 25px;
+                height: calc(100% - 60px); display: flex;
+                flex-direction: column; padding: 0 25px 25px 25px;
             }
             .header-title { display: none; } 
             .form-grid { grid-template-columns: 1fr; } 
@@ -197,17 +117,14 @@
     </style>
 </head>
 <body>
-    <div id="app-container">
-        </div>
+    <div id="app-container"></div>
     <div id="modals-container"></div>
 
     <script>
-        // --- DATA STATE & CONSTANTS ---
         let products = [], cart = [], expenses = [], salesHistory = [], dailyReports = [], lastTransaction = {};
         const currencySymbol = '₱';
         const DB_VERSION = 'v70';
 
-        // --- APP INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             loadAllData();
             renderAppShell();
@@ -220,16 +137,13 @@
             dailyReports = JSON.parse(localStorage.getItem(`pos_dailyReports_${DB_VERSION}`) || '[]');
         }
 
-        function persist(key, data) { localStorage.setItem(`${key}_${DB_VERSION}`, JSON.stringify(data));
-        }
+        function persist(key, data) { localStorage.setItem(`${key}_${DB_VERSION}`, JSON.stringify(data)); }
         
-        // --- DRAGGABLE FOOTER LOGIC ---
         function initializeDraggablePanel() {
             const panelContainer = document.querySelector('.sale-panel-container');
             const header = document.querySelector('.sale-panel-header');
             const grid = document.querySelector('.sales-view-grid');
             if (!header || !panelContainer || !grid) return;
-
             const states = {
                 collapsed: 60,
                 partial: window.innerHeight * 0.45,
@@ -243,15 +157,12 @@
                 panelContainer.style.setProperty('--panel-height', `${height}px`);
                 grid.style.paddingBottom = `${height}px`;
             };
-
             const onTouchMove = (e) => {
                 if (!isDragging) return;
-                // No page scroll while dragging panel
-                e.preventDefault(); 
+                e.preventDefault();
                 const newY = e.touches[0].clientY;
                 const deltaY = startY - newY;
                 let newHeight = startHeight + deltaY;
-                
                 newHeight = Math.max(states.collapsed, Math.min(newHeight, states.full));
                 panelContainer.style.setProperty('--panel-height', `${newHeight}px`);
             };
@@ -267,7 +178,6 @@
                 const distToCollapsed = Math.abs(currentHeight - states.collapsed);
                 const distToPartial = Math.abs(currentHeight - states.partial);
                 const distToFull = Math.abs(currentHeight - states.full);
-
                 if (distToCollapsed < distToPartial && distToCollapsed < distToFull) {
                     setPanelState('collapsed');
                 } else if (distToPartial < distToFull) {
@@ -276,36 +186,31 @@
                     setPanelState('full');
                 }
             };
-
             const onTouchStart = (e) => {
                 isDragging = true;
                 panelContainer.style.transition = 'none';
                 startY = e.touches[0].clientY;
                 startHeight = panelContainer.offsetHeight;
                 header.style.cursor = 'grabbing';
-                // Add listeners to the whole document to capture movement anywhere on screen
                 document.addEventListener('touchmove', onTouchMove, { passive: false });
                 document.addEventListener('touchend', onTouchEnd, { passive: false });
             };
 
-            // Only start the drag if the touch begins on the header
             header.addEventListener('touchstart', onTouchStart, { passive: true });
-
             setPanelState('collapsed');
         }
 
 
-        // --- VIEW MANAGEMENT ---
         function renderAppShell() {
             document.getElementById('app-container').innerHTML = `
                 <header class="header">
                     <div class="header-title">SoftDrinks POS</div>
                     <div class="nav-buttons">
-                         <button id="nav-sales" class="btn nav-btn" onclick="showView('sales')">Sales</button>
+                        <button id="nav-sales" class="btn nav-btn" onclick="showView('sales')">Sales</button>
                          <button id="nav-admin" class="btn nav-btn" onclick="showView('admin')">Admin</button>
                     </div>
                 </header>
-               <main>
+                <main>
                     <div id="sales-view" class="view"></div>
                     <div id="admin-view" class="view"></div>
                 </main>`;
@@ -321,7 +226,6 @@
             if (renderers[viewId]) renderers[viewId]();
         }
 
-        // --- RENDER FUNCTIONS ---
         function renderSalesView() {
             const container = document.getElementById('sales-view');
             container.innerHTML = `<div class="sales-view-grid">
@@ -372,7 +276,7 @@
                    <div class="name">${p.name}</div>
                     <div class="stock">Stock: ${cases} ${p.caseName}(s), ${units} ${p.unitName}(s)</div>
                     <div class="product-actions">
-                         <button class="btn btn-sm" style="background-color: var(--primary-dark);" onclick="addToCart(${p.id}, 'unit')" ${p.stock < 1 ? 'disabled' : ''}>${p.unitName}<br>${currencySymbol}${p.sellPrice.toFixed(2)}</button>
+                        <button class="btn btn-sm" style="background-color: var(--primary-dark);" onclick="addToCart(${p.id}, 'unit')" ${p.stock < 1 ? 'disabled' : ''}>${p.unitName}<br>${currencySymbol}${p.sellPrice.toFixed(2)}</button>
                          ${halfCaseButton}
                           <button class="btn btn-sm btn-secondary" onclick="addToCart(${p.id}, 'case')" ${p.stock < p.unitsPerCase ? 'disabled' : ''}>${p.caseName}<br>${currencySymbol}${casePrice.toFixed(2)}</button>
                     </div></div>`;
@@ -389,11 +293,11 @@
                     <span class="cart-item-name">${item.name}</span>
                     <div class="cart-item-controls">
                         <button onclick="decreaseCartItem('${item.cartItemId}')">-</button>
-                         <span>${item.quantity}</span>
+                        <span>${item.quantity}</span>
                         <button onclick="increaseCartItem('${item.cartItemId}')">+</button>
                         <button class="remove-btn" onclick="removeCartItem('${item.cartItemId}')">🗑️</button>
                     </div>
-               <span class="cart-item-total">${currencySymbol}${(item.sellPrice * item.quantity).toFixed(2)}</span>
+                    <span class="cart-item-total">${currencySymbol}${(item.sellPrice * item.quantity).toFixed(2)}</span>
                 </li>`).join('') : '<li style="text-align:center; padding: 20px 0; color: var(--text-light);">Cart is empty</li>';
             cartTotalEl.textContent = `${currencySymbol}${total.toFixed(2)}`;
         }
@@ -411,7 +315,7 @@
                 header.addEventListener('click', () => {
                     const content = header.nextElementSibling;
                     content.style.display = content.style.display === 'block' ? 'none' : 'block';
-               });
+                });
             });
         }
         
@@ -422,7 +326,7 @@
         function renderSalesHistory() {
             return `<div class="card-header" style="padding:0; margin-bottom:20px;"><h3 style="margin:0;">Recent Transactions</h3><button class="btn btn-sm" onclick="exportToCsv('sales_history.csv', salesHistory)">Export (CSV)</button></div>
             <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Items</th><th>Total</th><th>Action</th></tr></thead>
-            <tbody>${[...salesHistory].reverse().map(t => `<tr><td>${new Date(t.date).toLocaleString()}</td><td>${t.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td><td>${currencySymbol}${t.total.toFixed(2)}</td><td><button class="btn btn-sm" onclick='reprintReceipt(${t.id})'>Reprint</button></td></tr>`).join('')}</tbody>
+            <tbody>${[...salesHistory].reverse().map(t => `<tr><td>${new Date(t.date).toLocaleStr()}</td><td>${t.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td><td>${currencySymbol}${t.total.toFixed(2)}</td><td><button class="btn btn-sm" onclick='reprintReceipt(${t.id})'>Reprint</button></td></tr>`).join('')}</tbody>
         </table></div>`;
         }
 
@@ -449,7 +353,6 @@
             </table></div>`;
         }
         
-        // --- CORE LOGIC (omitted for brevity, no changes from previous version) ---
         function addToCart(productId, type) { if (document.getElementById('process-sale-btn')?.disabled) return; const product = products.find(p => p.id === productId); const cartItemId = `${productId}-${type}`; let unitsPerItem; if (type === 'case') { unitsPerItem = product.unitsPerCase; } else if (type === 'half-case') { unitsPerItem = product.unitsPerHalfCase; } else { unitsPerItem = 1; } if (!product || product.stock < unitsPerItem) { alert('Not enough stock!'); return; } const existingCartItem = cart.find(item => item.cartItemId === cartItemId); if (existingCartItem) { let totalUnitsInCartForThisProduct = 0; cart.forEach(item => { if (item.id === productId) { let units = 1; if (item.type === 'case') units = item.unitsPerCase; else if (item.type === 'half-case') units = item.unitsPerHalfCase; totalUnitsInCartForThisProduct += item.quantity * units; } }); if (product.stock >= totalUnitsInCartForThisProduct + unitsPerItem) { existingCartItem.quantity++; } else { alert('Not enough stock to add another ' + type); return; } } else { let price, name; if (type === 'case') { price = product.caseSellPrice > 0 ? product.caseSellPrice : (product.sellPrice * product.unitsPerCase); name = `${product.name} (${product.caseName})`; } else if (type === 'half-case') { price = product.halfCaseSellPrice; name = `${product.name} (Half-Case)`; } else { price = product.sellPrice; name = `${product.name} (${product.unitName})`; } cart.push({ ...product, cartItemId: cartItemId, type: type, name: name, sellPrice: price, quantity: 1 }); } renderCart(); }
         function decreaseCartItem(cartItemId) { const cartItem = cart.find(item => item.cartItemId === cartItemId); if (cartItem) { cartItem.quantity--; if (cartItem.quantity <= 0) removeCartItem(cartItemId); else renderCart(); } }
         function increaseCartItem(cartItemId) { const cartItem = cart.find(item => item.cartItemId === cartItemId); if(cartItem) { addToCart(cartItem.id, cartItem.type); } }
@@ -474,15 +377,14 @@
         function triggerImport() { if (!confirm('This will overwrite all current products. Make sure you have a backup. Continue?')) { return; } const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.csv'; fileInput.onchange = importProducts; fileInput.click(); }
         function importProducts(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { const text = e.target.result; try { const parsedProducts = parseCsv(text); if (parsedProducts.length > 0) { products = parsedProducts; persist('pos_products', products); alert(`Successfully imported ${products.length} products!`); openInventoryView(); renderProducts(); } else { alert('Could not find valid product data in the file.'); } } catch (error) { alert(`An error occurred: ${error.message}`); } }; reader.readAsText(file); }
         function parseCsv(csvText) { const lines = csvText.trim().split(/\r\n|\n/); if (lines.length < 2) return []; const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '')); const requiredHeaders = ['name', 'sellPrice', 'unitsPerCase', 'purchasePriceCase']; if (!requiredHeaders.every(h => headers.includes(h))) { throw new Error('CSV file is missing required headers: ' + requiredHeaders.join(', ')); } const newProducts = []; for (let i = 1; i < lines.length; i++) { if (!lines[i]) continue; const values = lines[i].split(',').map(v => v.trim().replace(/"/g, '')); let productObj = {}; headers.forEach((header, index) => { productObj[header] = values[index]; }); const unitsPerCase = parseInt(productObj.unitsPerCase) || 1; const purchasePriceCase = parseFloat(productObj.purchasePriceCase) || 0; productObj = { ...productObj, id: Date.now() + i, stock: parseInt(productObj.stock) || 0, unitsPerCase: unitsPerCase, purchasePriceCase: purchasePriceCase, purchasePrice: (unitsPerCase > 0) ? (purchasePriceCase / unitsPerCase) : 0, sellPrice: parseFloat(productObj.sellPrice), caseSellPrice: parseFloat(productObj.caseSellPrice) || 0, unitsPerHalfCase: parseInt(productObj.unitsPerHalfCase) || 0, halfCaseSellPrice: parseFloat(productObj.halfCaseSellPrice) || 0 }; if (productObj.name && !isNaN(productObj.sellPrice)) { newProducts.push(productObj); } } return newProducts; }
-
     </script>
+    
     <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/LLAVOREPOS/sw.js');
-    });
-  }
-</script>
-
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/LLAVOREPOS/sw.js');
+        });
+      }
+    </script>
 </body>
 </html>
