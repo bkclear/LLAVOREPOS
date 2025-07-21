@@ -1,41 +1,27 @@
-const CACHE_NAME = 'pos-cache-v2'; // Changed to v2 to force an update
-const urlsToCache = [
-  '/LLAVOREPOS/',
-  '/LLAVOREPOS/index.html'
+const CACHE_NAME = 'llavorepos-cache-v1';
+const URLS_TO_CACHE = [
+  '/',
+  '/index.html',
+  '/sw.js',
+  // Add other assets if needed, like:
+  // '/styles.css',
+  // '/script.js',
 ];
 
-// Install the service worker and cache the essential app files
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(URLS_TO_CACHE);
+    })
   );
 });
 
-// Serve files from the cache when offline
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
-  );
-});
-
-// Delete old caches on activation
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    }).catch(() => {
+      return caches.match('/index.html'); // fallback
     })
   );
 });
